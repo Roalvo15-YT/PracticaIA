@@ -50,14 +50,14 @@ namespace Components.QLearning
 
         private int _steps = 0;
         private int _captures = 0;
-
+        
         private void Start()
         {
             _worldInfo = WorldManager.Instance.WorldInfo;
 
             Type qMindType = System.Type.GetType(qMindClass);
             Assert.IsNotNull(qMindType);
-            _qMind = (IQMind)Activator.CreateInstance(qMindType);
+            _qMind = (IQMind) Activator.CreateInstance(qMindType);
             _qMind.Initialize(_worldInfo);
 
             _navigationAlgorithm = new AStarNavigation();
@@ -77,7 +77,7 @@ namespace Components.QLearning
                 MoveAgent();
                 MoveOpponent();
                 
-                if(_agentCell == _opponentCell)
+                if(_agentCell == _opponentCell || !_agentCell.Walkable)
                 {
                     _captures++;
                     Debug.Log($"Opponent captured agent in {_steps} steps");
@@ -102,8 +102,10 @@ namespace Components.QLearning
 
         private void MoveOpponent()
         {
-            CellInfo[] path = _navigationAlgorithm.GetPath(_opponentCell, _agentCell, 1);
-            if (path.Length > 0)
+            CellInfo[] path;
+            path = _navigationAlgorithm.GetPath(_opponentCell, _agentCell, 1);
+            
+            if (path != null && path.Length > 0)
             {
                 _opponentCell = path[0];    
             }
