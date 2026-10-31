@@ -23,7 +23,7 @@ using NavigationDJIA.World;
 ///  ya que esa clave se usará como índice en la TablaQ y en el archivo CSV.
 /// </summary>
 
-namespace GrupoA
+namespace GrupoB
 {
     public sealed class QState
     {
@@ -38,10 +38,13 @@ namespace GrupoA
             AgentY = agent.y;
             OtherX = other.x;
             OtherY = other.y;
+            
+
         }
 
         public string ToKey()
         {
+            //Clave que representa el estado
             return $"{AgentX},{AgentY}|{OtherX},{OtherY}";
         }
     }
