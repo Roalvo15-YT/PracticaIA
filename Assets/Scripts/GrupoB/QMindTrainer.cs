@@ -4,7 +4,7 @@ using NavigationDJIA.World;
 using QMind;
 using QMind.Interfaces;
 
-namespace GrupoA
+namespace GrupoB
 {
     public class QMindTrainer : IQMindTrainer
     {
@@ -134,13 +134,23 @@ namespace GrupoA
         /// </summary>
         private QAction ChooseAction(string stateKey, bool train)
         {
-            // TODO (alumno):
-            // 1. Si !train -> return _qTable.GetBestAction(stateKey);
-            // 2. Si train:
-            //    - double r = _random.NextDouble();
-            //    - si r < _params.epsilon -> acción aleatoria
-            //    - si no -> _qTable.GetBestAction(stateKey)
-            throw new NotImplementedException();
+            // En ejecución normal, siempre la mejor acción
+            if (!train)
+            {
+                return _qTable.GetBestAction(stateKey);
+            }
+
+            // Exploración
+            double r = _random.NextDouble();
+
+            if (r < _params.epsilon)
+            {
+                Array actions = Enum.GetValues(typeof(QAction));
+                return (QAction)actions.GetValue(_random.Next(actions.Length));
+            }
+
+            // Explotación
+            return _qTable.GetBestAction(stateKey);
         }
 
         /// <summary>
@@ -151,11 +161,11 @@ namespace GrupoA
         private void UpdateQ(string stateKey, QAction action, float reward, string nextStateKey)
         {
             // TODO (alumno):
-            // float oldQ = _qTable.GetQ(stateKey, action);
-            // float maxQNext = _qTable.GetMaxQ(nextStateKey);
-            // float target = reward + _params.gamma * maxQNext;
-            // float newQ = (1 - _params.alpha) * oldQ + _params.alpha * target;
-            // _qTable.SetQ(stateKey, action, newQ);
+            float oldQ = _qTable.GetQ(stateKey, action);
+             float maxQNext = _qTable.GetMaxQ(nextStateKey);
+            float target = reward + _params.gamma * maxQNext;
+            float newQ = (1 - _params.alpha) * oldQ + _params.alpha * target;
+            _qTable.SetQ(stateKey, action, newQ);
             throw new NotImplementedException();
         }
 
@@ -167,10 +177,15 @@ namespace GrupoA
         /// </summary>
         private float ComputeReward(CellInfo agent, CellInfo other)
         {
-            // TODO (alumno).
-            // Ejemplo orientativo:
-            // if (agent == other) return 10f;
-            // else return -0.01f;
+            // Captura
+            if (agent == other)
+            {
+                return 10f;
+            }
+
+            // Coste por paso
+            return -0.01f;
+        
             throw new NotImplementedException();
         }
 
@@ -182,7 +197,7 @@ namespace GrupoA
         private bool IsTerminalState(CellInfo agent, CellInfo other)
         {
             // TODO (alumno):
-            // return agent == other;
+            return agent == other;
             throw new NotImplementedException();
         }
 
@@ -214,5 +229,7 @@ namespace GrupoA
             return opponent;
         }
         #endregion
+
+       
     }
 }

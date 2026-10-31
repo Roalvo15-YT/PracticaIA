@@ -1,7 +1,7 @@
 using System;
 using QMind;
 
-namespace GrupoA
+namespace GrupoB
 {
     public class QTable
     {
