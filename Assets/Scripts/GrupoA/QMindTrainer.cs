@@ -67,6 +67,7 @@ namespace GrupoA
 
         private void EndEpisode()
         {
+            //UnityEngine.Debug.Log($"Episodio {CurrentEpisode}: {CurrentStep} pasos");
             _qTable.SaveToCsv();
 
             OnEpisodeFinished?.Invoke(this, EventArgs.Empty);
@@ -90,10 +91,10 @@ namespace GrupoA
             // Nuevos estados del agente y del oponente
             CellInfo newAgentPos = ApplyAction(_agentPosition, action);
             CellInfo newOtherPos = MoveOpponent(_otherPosition, newAgentPos.Walkable ? newAgentPos : _agentPosition);
-            
+
             // Nuevo estado del agente
             string nextStateKey = BuildStateKey(newAgentPos, newOtherPos, _worldInfo);
-            
+
             // Calcula la recompensa
             float reward = ComputeReward(newAgentPos, newOtherPos);
 
@@ -122,93 +123,77 @@ namespace GrupoA
 
         private string BuildStateKey(CellInfo agent, CellInfo other, WorldInfo _worldInfo)
         {
-            var state = new QState(agent, other);
+            var state = new QState(agent, other, _worldInfo);
             return state.ToKey();
         }
 
         /// <summary>
-        /// Ejemplo orientativo:
-        ///    - Si train == false, puedes usar la mejor acción.
-        ///    - Si train == true, con probabilidad epsilon elegir acción aleatoria,
-        ///      y con probabilidad 1-epsilon la mejor según _qTable.GetBestAction(stateKey).
+        /// ε-greedy: en entrenamiento, con probabilidad epsilon acción aleatoria;
+        /// en el resto de casos, la mejor acción según la tabla Q.
         /// </summary>
         private QAction ChooseAction(string stateKey, bool train)
         {
-            // TODO (alumno):
-            // 1. Si !train -> return _qTable.GetBestAction(stateKey);
-            // 2. Si train:
-            //    - double r = _random.NextDouble();
-            //    - si r < _params.epsilon -> acción aleatoria
-            //    - si no -> _qTable.GetBestAction(stateKey)
-            throw new NotImplementedException();
+            if (train && _random.NextDouble() < _params.epsilon)
+                return (QAction)_random.Next(Enum.GetNames(typeof(QAction)).Length);
+
+            return _qTable.GetBestAction(stateKey);
         }
 
         /// <summary>
-        /// Actualización de Q-Learning:
         /// Q(s,a) = (1 - alpha) * Q(s,a) + alpha * (reward + gamma * max_a' Q(s',a')).
-        /// Usa _qTable.GetQ, _qTable.SetQ y _qTable.GetMaxQ.
+        /// En estados terminales (captura) Q(s',·) nunca se actualiza y vale 0,
+        /// por lo que el objetivo se reduce a "reward" sin código adicional.
         /// </summary>
         private void UpdateQ(string stateKey, QAction action, float reward, string nextStateKey)
         {
-            // TODO (alumno):
-            // float oldQ = _qTable.GetQ(stateKey, action);
-            // float maxQNext = _qTable.GetMaxQ(nextStateKey);
-            // float target = reward + _params.gamma * maxQNext;
-            // float newQ = (1 - _params.alpha) * oldQ + _params.alpha * target;
-            // _qTable.SetQ(stateKey, action, newQ);
-            throw new NotImplementedException();
+            float oldQ = _qTable.GetQ(stateKey, action);
+            float target = reward + _params.gamma * _qTable.GetMaxQ(nextStateKey);
+            _qTable.SetQ(stateKey, action, (1 - _params.alpha) * oldQ + _params.alpha * target);
         }
 
         /// <summary>
-        /// Función de recompensa.
-        /// Ejemplo orientativo:
-        ///   si agent == other -> recompensa positiva grande (captura)
-        ///   si no -> pequeña penalización negativa por cada paso.
+        /// Capturado: -100. Sobrevive un paso: +1.
         /// </summary>
         private float ComputeReward(CellInfo agent, CellInfo other)
         {
-            // TODO (alumno).
-            // Ejemplo orientativo:
-            // if (agent == other) return 10f;
-            // else return -0.01f;
-            throw new NotImplementedException();
+            return agent.Equals(other) ? -100f : 1f;
         }
 
         /// <summary>
-        /// Condición de final de episodio.
-        /// Lo más simple: cuando agente y oponente están en la misma celda.
-        /// También puedes definir una probabilidad para el parámetro v visto en clase.
+        /// Fin de episodio: el enemigo atrapa al agente, o se alcanza Max Steps
+        /// (si vale -1 no se aplica). Así el episodio termina aunque el agente sea muy bueno.
         /// </summary>
         private bool IsTerminalState(CellInfo agent, CellInfo other)
         {
-            // TODO (alumno):
-            // return agent == other;
-            throw new NotImplementedException();
+            return agent.Equals(other) || (_params.maxSteps > 0 && CurrentStep >= _params.maxSteps);
         }
 
 
         private CellInfo ApplyAction(CellInfo agentCell, QAction action)
         {
-            int nx = agentCell.x;;
+            int nx = agentCell.x;
             int ny = agentCell.y;
 
             switch (action)
             {
-                case QAction.Up:    ny += 1; break;
-                case QAction.Down:  ny -= 1; break;
+                case QAction.Up: ny += 1; break;
+                case QAction.Down: ny -= 1; break;
                 case QAction.Right: nx += 1; break;
-                case QAction.Left:  nx -= 1; break;
-                case QAction.Stay:  return agentCell;
+                case QAction.Left: nx -= 1; break;
+                case QAction.Stay: return agentCell;
             }
 
-            return _worldInfo[nx, ny];
+            // Si la celda destino es un muro o está fuera del tablero, el agente se queda quieto.
+            CellInfo next = _worldInfo[nx, ny];
+            return next.Walkable ? next : agentCell;
         }
 
 
         private CellInfo MoveOpponent(CellInfo opponent, CellInfo target)
         {
             var path = _navigationAlgorithm.GetPath(opponent, target, 1);
-            if (path.Length > 0)
+            if (path == null) UnityEngine.Debug.Log("Sin camino al agente");
+            if (path != null && path.Length > 0)
                 return path[0];
 
             return opponent;

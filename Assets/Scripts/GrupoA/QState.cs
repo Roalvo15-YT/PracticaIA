@@ -1,48 +1,33 @@
 using NavigationDJIA.World;
 
-/// <summary>
-/// TODO(alumno):
-/// Define el "estado" que usará la Tabla Q para identificar cada situación del agente.
-/// 
-/// El estado debe contener toda la información necesaria para que el agente pueda
-/// tomar decisiones informadas. Tú decides qué características incluir según lo
-/// que consideres relevante para resolver el problema.
-/// 
-/// Ejemplos típicos de información que puede formar un estado:
-///   - Posición del agente en la grid.
-///   - Posición del otro personaje (enemigo).
-///   - Distancia relativa entre agente y enemigo.
-///   - Si hay muros en direcciones cercanas.
-///   - Cualquier otro dato que consideres útil.
-/// 
-/// En este ejercicio te damos un ejemplo simple basado únicamente en las posiciones
-/// del agente y del oponente. Puedes usarlo tal cual o ampliarlo.
-/// 
-/// IMPORTANTE: 
-///  El estado debe poder convertirse a una clave única (string) mediante ToKey(),
-///  ya que esa clave se usará como índice en la TablaQ y en el archivo CSV.
-/// </summary>
-
 namespace GrupoA
 {
+    /// <summary>
+    /// Estado = (posición RELATIVA del enemigo recortada a [-4,4]) + (4 bits de muros adyacentes).
+    /// Al no usar coordenadas absolutas, sirve para cualquier disposición de muros.
+    /// </summary>
     public sealed class QState
     {
-        public int AgentX { get; }
-        public int AgentY { get; }
-        public int OtherX { get; }
-        public int OtherY { get; }
+        private const int MaxDist = 4;
 
-        public QState(CellInfo agent, CellInfo other)
+        public int DX { get; }      // other.x - agent.x (recortado)
+        public int DY { get; }      // other.y - agent.y (recortado)
+        public int Walls { get; }   // bits: 1=Arriba, 2=Abajo, 4=Izquierda, 8=Derecha bloqueados
+
+        public QState(CellInfo agent, CellInfo other, WorldInfo world)
         {
-            AgentX = agent.x;
-            AgentY = agent.y;
-            OtherX = other.x;
-            OtherY = other.y;
+            DX = System.Math.Clamp(other.x - agent.x, -MaxDist, MaxDist);
+            DY = System.Math.Clamp(other.y - agent.y, -MaxDist, MaxDist);
+
+            Walls = (world[agent.x, agent.y + 1].Walkable ? 0 : 1)
+                  | (world[agent.x, agent.y - 1].Walkable ? 0 : 2)
+                  | (world[agent.x - 1, agent.y].Walkable ? 0 : 4)
+                  | (world[agent.x + 1, agent.y].Walkable ? 0 : 8);
         }
 
         public string ToKey()
         {
-            return $"{AgentX},{AgentY}|{OtherX},{OtherY}";
+            return $"{DX},{DY}|{Walls}";
         }
     }
 }
