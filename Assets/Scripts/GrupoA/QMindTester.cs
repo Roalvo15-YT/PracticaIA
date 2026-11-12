@@ -23,7 +23,7 @@ namespace GrupoA
         {
             string stateKey = BuildStateKey(currentPosition, otherPosition, _worldInfo);
 
-            UnityEngine.Debug.Log($"[Test] {stateKey} | en tabla: {_qStorage.Data.ContainsKey(stateKey)} | estados: {_qStorage.Data.Count}");
+            //UnityEngine.Debug.Log($"[Test] {stateKey} | en tabla: {_qStorage.Data.ContainsKey(stateKey)} | estados: {_qStorage.Data.Count}");
 
             QAction bestAction = _qTable.GetBestAction(stateKey);
 
