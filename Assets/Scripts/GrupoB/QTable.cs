@@ -15,6 +15,7 @@ namespace GrupoB
         }
 
         private void EnsureState(string stateKey)
+            //Se asegura de que el estado existe
         {
             if (!_storage.Data.ContainsKey(stateKey))
             {
@@ -36,7 +37,9 @@ namespace GrupoB
         public float GetQ(string stateKey, QAction action)
         {
             // Implementa aquí la lectura de Q(s,a) desde la tabla
-            throw new NotImplementedException();
+            EnsureState(stateKey); //comprobar que existe el estado
+            int index = (int) action;
+            return _storage.Data[stateKey][index];
         }
 
         /// <summary>
@@ -53,7 +56,9 @@ namespace GrupoB
         public void SetQ(string stateKey, QAction action, float value)
         {
             // Implementa aquí la escritura de Q(s,a) en la tabla
-            throw new NotImplementedException();
+            EnsureState(stateKey); //comprobar que existe
+            int index = (int) action;
+            _storage.Data[stateKey][index] = value;
         }
 
         /// <summary>
@@ -72,7 +77,17 @@ namespace GrupoB
         public float GetMaxQ(string stateKey)
         {
             // Implementa aquí el cálculo de max_a Q(s,a)
-            throw new NotImplementedException();
+            EnsureState(stateKey); //comprobar si existe
+            var qValues = _storage.Data[stateKey];
+            int max = 0;
+            for (int i=1; i<qValues.Length; i++)
+            {
+                if (qValues[max] < qValues[i])
+                {
+                    max = i;
+                }
+            }
+            return qValues[max];
         }
 
         /// <summary>
@@ -95,9 +110,22 @@ namespace GrupoB
         public QAction GetBestAction(string stateKey)
         {
             // Implementa aquí la selección de la mejor acción según la Tabla Q
-            throw new NotImplementedException();
-        }
+            EnsureState(stateKey); //Comprobar si la clave existe
+            var qValues = _storage.Data[stateKey];
+            int bestOption = 0;
+            for(int i=1; i<qValues.Length; i++)
+                //i=1 porque primero compara con el 0
+            {
+                if (qValues[i] > qValues[bestOption])
+                {
+                    bestOption = i;
+                }
+                //si hay más dValores con el mismo valor escoge el primero que encuentra
+            }
 
+            return (QAction)bestOption;
+        }
+        
         public void SaveToCsv()
         {
             _storage.Save();

@@ -31,7 +31,7 @@ namespace GrupoB
 
         private string BuildStateKey(CellInfo agent, CellInfo other, WorldInfo _worldInfo)
         {
-            var state = new QState(agent, other);
+            var state = new QState(agent, other, _worldInfo);
             return state.ToKey();
         }
 

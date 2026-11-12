@@ -35,6 +35,7 @@ namespace QMind
             Console.WriteLine($"[QTableStorage] Q-table path: {_filePath}");
             
             Load();
+            UnityEngine.Debug.Log($"[QTableStorage] Estados cargados: {Data.Count}");
         }
 
         private static string ResolveGrupoNameFromCallStack()

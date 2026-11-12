@@ -1,8 +1,10 @@
-using System;
 using NavigationDJIA.Interfaces;
 using NavigationDJIA.World;
 using QMind;
 using QMind.Interfaces;
+using System;
+using System.Runtime.ExceptionServices;
+using UnityEngine;
 
 namespace GrupoB
 {
@@ -84,7 +86,7 @@ namespace GrupoB
             // Estado actual del agente
             string stateKey = BuildStateKey(_agentPosition, _otherPosition, _worldInfo);
 
-            // Seleciona la acción a realizar
+            // Seleciona la acción a realizar (cambio de cabecera para que también tenga QState)
             QAction action = ChooseAction(stateKey, train);
 
             // Nuevos estados del agente y del oponente
@@ -122,7 +124,7 @@ namespace GrupoB
 
         private string BuildStateKey(CellInfo agent, CellInfo other, WorldInfo _worldInfo)
         {
-            var state = new QState(agent, other);
+            var state = new QState(agent, other, _worldInfo);
             return state.ToKey();
         }
 
@@ -140,7 +142,26 @@ namespace GrupoB
             //    - double r = _random.NextDouble();
             //    - si r < _params.epsilon -> acción aleatoria
             //    - si no -> _qTable.GetBestAction(stateKey)
-            throw new NotImplementedException();
+            //La salida es un enumerado que puede ser: Up, Down, Left, Right o Stay
+            if (train)
+            {
+                double r = _random.NextDouble();
+                if (r < _params.epsilon)
+                {
+                    //Acción aleatoria
+                    return (QAction) _random.Next(Enum.GetValues(typeof(QAction)).Length);
+                }
+                else
+                {
+                    //Mejor acción
+                    return _qTable.GetBestAction(stateKey);
+                }
+            }
+            else
+            {
+                //Mejor acción
+                return _qTable.GetBestAction(stateKey);
+            }
         }
 
         /// <summary>
@@ -156,7 +177,11 @@ namespace GrupoB
             // float target = reward + _params.gamma * maxQNext;
             // float newQ = (1 - _params.alpha) * oldQ + _params.alpha * target;
             // _qTable.SetQ(stateKey, action, newQ);
-            throw new NotImplementedException();
+            float oldQ = _qTable.GetQ(stateKey, action); //Sacar el antiguo valor Q
+            float maxQNext = _qTable.GetMaxQ(nextStateKey); //Sacar el maximo valor Q del siguiente paso
+            float target = reward + _params.gamma * maxQNext;
+            float newQ = (1 - _params.alpha) * oldQ + _params.alpha * target;
+            _qTable.SetQ(stateKey, action, newQ);
         }
 
         /// <summary>
@@ -171,7 +196,16 @@ namespace GrupoB
             // Ejemplo orientativo:
             // if (agent == other) return 10f;
             // else return -0.01f;
-            throw new NotImplementedException();
+            float reward;
+            if((agent.x == other.x && agent.y == other.y) || !agent.Walkable)
+            {
+                reward = -100;
+            }
+            else
+            {
+                reward = 1;
+            }
+            return reward;
         }
 
         /// <summary>
@@ -183,7 +217,12 @@ namespace GrupoB
         {
             // TODO (alumno):
             // return agent == other;
-            throw new NotImplementedException();
+            bool estadoTerminal = false;
+            if(!agent.Walkable || agent.Equals(other))
+            {
+                estadoTerminal = true;
+            }
+            return estadoTerminal;
         }
 
 
