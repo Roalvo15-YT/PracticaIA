@@ -683,7 +683,7 @@ Transform:
   m_GameObject: {fileID: 224659731}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 6.22, y: 0, z: 0.86}
+  m_LocalPosition: {x: 5.5, y: 0, z: 0.86}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3024,7 +3024,7 @@ Transform:
   m_GameObject: {fileID: 369616986}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 13.41, y: 0, z: 1.71}
+  m_LocalPosition: {x: 12.81, y: 0, z: 1.71}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3366,7 +3366,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &414741301
 Transform:
   m_ObjectHideFlags: 0
@@ -3427,7 +3427,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 414741300}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a866efa109664c6e8eb59ac6dd601f94, type: 3}
   m_Name: 
@@ -4179,14 +4179,14 @@ MonoBehaviour:
   other: {fileID: 1518200256}
   qLearningTrainerClass: GrupoA.QMindTrainer, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
-  showSimulation: 0
-  agentSpeed: 999
-  train: 1
+  showSimulation: 1
+  agentSpeed: 1000
+  train: 0
   algorithmParams:
     alpha: 0.2
     epsilon: 0.85
     gamma: 0.9
-    episodes: 15000
+    episodes: 1000
     maxSteps: 8000
     episodesBetweenSaves: 100
 --- !u!4 &430024629
@@ -7794,7 +7794,7 @@ Transform:
   m_GameObject: {fileID: 815002462}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.22, y: 0, z: -0.16}
+  m_LocalPosition: {x: 1.22, y: 0, z: 0.6}
   m_LocalScale: {x: 1, y: 1, z: 0.804818}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18190,7 +18190,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1602712531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18205,12 +18205,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GrupoA.RandomMapGenerator
   wallPrefab: {fileID: 2086224352}
   seed: 0
-  minSegments: 10
-  maxSegments: 23
-  minLength: 3
-  maxLength: 5
-  minFreeFraction: 0.2
-  wallThickness: 0.5
+  minSegments: 50
+  maxSegments: 55
+  minLength: 1
+  maxLength: 4
+  minFreeFraction: 0.95
+  wallThickness: 0.75
 --- !u!114 &1602712532
 MonoBehaviour:
   m_ObjectHideFlags: 0
