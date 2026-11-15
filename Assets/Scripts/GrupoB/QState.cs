@@ -1,5 +1,6 @@
 using NavigationDJIA.World;
 
+<<<<<<< Updated upstream
 /// <summary>
 /// TODO(alumno):
 /// Define el "estado" que usará la Tabla Q para identificar cada situación del agente.
@@ -23,6 +24,8 @@ using NavigationDJIA.World;
 ///  ya que esa clave se usará como índice en la TablaQ y en el archivo CSV.
 /// </summary>
 
+=======
+>>>>>>> Stashed changes
 namespace GrupoB
 {
     public sealed class QState
